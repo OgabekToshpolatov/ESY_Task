@@ -23,6 +23,7 @@ public class AccountController:ControllerBase
         _logger = logger ;
         _userManager = userManager;
         _signManager = signInManager;
+
     }
 
     [HttpPost("signup")]
@@ -56,12 +57,7 @@ public class AccountController:ControllerBase
         if(!ModelState.IsValid)
                 return BadRequest();
 
-        // if(!await _userManager.Users.AnyAsync(user => user.UserName == userSignInDto.UserName))
-        //         return NotFound();
-
-        var user = _userManager.FindByNameAsync(userSignInDto.UserName);
-
-        if(user is null)
+        if(!await _userManager.Users.AnyAsync(user => user.UserName == userSignInDto.UserName))
                 return NotFound();
 
         var result = await _signManager.PasswordSignInAsync(userSignInDto.UserName, userSignInDto.Password,
@@ -70,6 +66,6 @@ public class AccountController:ControllerBase
         if(!result.Succeeded)
                 return BadRequest();
 
-       return Ok();
+       return Ok(userSignInDto);
     }
 }

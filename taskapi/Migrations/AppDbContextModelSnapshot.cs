@@ -145,6 +145,54 @@ namespace taskapi.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("taskapi.Entities.Product", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<double>("Price")
+                        .HasColumnType("REAL");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("taskapi.Entities.ProductAudit", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long?>("NewValueId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long?>("OldValueId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NewValueId");
+
+                    b.HasIndex("OldValueId");
+
+                    b.ToTable("ProductAudits");
+                });
+
             modelBuilder.Entity("taskapi.Entities.User", b =>
                 {
                     b.Property<string>("Id")
@@ -264,6 +312,21 @@ namespace taskapi.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("taskapi.Entities.ProductAudit", b =>
+                {
+                    b.HasOne("taskapi.Entities.Product", "NewValue")
+                        .WithMany()
+                        .HasForeignKey("NewValueId");
+
+                    b.HasOne("taskapi.Entities.Product", "OldValue")
+                        .WithMany()
+                        .HasForeignKey("OldValueId");
+
+                    b.Navigation("NewValue");
+
+                    b.Navigation("OldValue");
                 });
 #pragma warning restore 612, 618
         }

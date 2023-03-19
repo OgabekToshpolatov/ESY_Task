@@ -44,6 +44,5 @@ app.MapControllers();
 
 // await AppDbSeed.InitializeUserAsync(app);
 // await AppDbSeed.InitializeRoleAsync(app);
-AppDbSeed.SeedUsersAndRolesAsync(app).Wait();
-
+// AppDbSeed.SeedUsersAndRolesAsync(app).Wait();
 app.Run();
