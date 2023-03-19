@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using taskapi.Data;
 using taskapi.Entities;
+using taskapi.Services;
+using taskapi.Statics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +13,8 @@ builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<IProductService,ProductService>();
 
 builder.Services.AddIdentity<User,IdentityRole>(options => {
 
@@ -27,6 +31,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>{
     options.UseSqlite("Data Source = data.db");
 });
 
+Vat.Value = double.Parse(builder.Configuration["VAT"]);
+
 var app = builder.Build();
 
 
@@ -38,11 +44,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
-// await AppDbSeed.InitializeUserAsync(app);
-// await AppDbSeed.InitializeRoleAsync(app);
-// AppDbSeed.SeedUsersAndRolesAsync(app).Wait();
+AppDbSeed.SeedUsersAndRolesAsync(app).Wait();
+
 app.Run();
