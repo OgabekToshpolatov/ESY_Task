@@ -8,13 +8,10 @@ public class ProductAudit
 {
     [Key,DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public long Id { get; set; }
+    public long ProductId { get; set; }
     public string? UserId { get; set; }
-    
-    [Display(Name ="OldValue")]
-    public virtual Product? OldValue { get; set; }
-
-    [Display(Name ="NewValue")]
-    public virtual Product? NewValue { get; set; }
+    [ForeignKey(nameof(UserId))]
+    public virtual User? User { get; set; }
     public EStatus Status { get; set; }
     public DateTime ChangeData { get; set; }
 

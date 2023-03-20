@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace taskapi.Data.Migrations
+namespace taskapi.Migrations
 {
     public partial class Init : Migration
     {
@@ -177,9 +177,8 @@ namespace taskapi.Data.Migrations
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    ProductId = table.Column<long>(type: "INTEGER", nullable: false),
                     UserId = table.Column<string>(type: "TEXT", nullable: true),
-                    OldValueId = table.Column<long>(type: "INTEGER", nullable: true),
-                    NewValueId = table.Column<long>(type: "INTEGER", nullable: true),
                     Status = table.Column<int>(type: "INTEGER", nullable: false),
                     ChangeData = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
@@ -187,14 +186,9 @@ namespace taskapi.Data.Migrations
                 {
                     table.PrimaryKey("PK_ProductAudits", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ProductAudits_Products_NewValueId",
-                        column: x => x.NewValueId,
-                        principalTable: "Products",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_ProductAudits_Products_OldValueId",
-                        column: x => x.OldValueId,
-                        principalTable: "Products",
+                        name: "FK_ProductAudits_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id");
                 });
 
@@ -236,14 +230,9 @@ namespace taskapi.Data.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductAudits_NewValueId",
+                name: "IX_ProductAudits_UserId",
                 table: "ProductAudits",
-                column: "NewValueId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductAudits_OldValueId",
-                table: "ProductAudits",
-                column: "OldValueId");
+                column: "UserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -267,13 +256,13 @@ namespace taskapi.Data.Migrations
                 name: "ProductAudits");
 
             migrationBuilder.DropTable(
+                name: "Products");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
-
-            migrationBuilder.DropTable(
-                name: "Products");
         }
     }
 }

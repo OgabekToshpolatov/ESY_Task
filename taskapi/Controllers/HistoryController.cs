@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using Microsoft.AspNetCore.Mvc;
 using taskapi.Services;
 
@@ -29,22 +30,29 @@ public class HistoryController:ControllerBase
         {
             Id = productAudit.Id,
             UserId = productAudit.UserId,
-            OldValue = null,
-            NewValue = productAudit.NewValue == null ? null:ConvertToProductModel(productAudit.NewValue),
+            User = productAudit.User == null ? null : ConvertToUserModel(productAudit.User),
+            Status = ConvertToEStatusModel(productAudit.Status),
             ChangeData = productAudit.ChangeData
         };
     }
 
-    private Dtos.ProductAudit.NewValue ConvertToProductModel(Entities.Product product)
+    private Dtos.AppUser.UserDto ConvertToUserModel(Entities.User user)
     {
-        return new Dtos.ProductAudit.NewValue
+        return new Dtos.AppUser.UserDto
         {
-            Id = product.Id,
-            Title = product.Title,
-            Quantity = product.Quantity,
-            Price = product.Price
+            Id = user.Id,
+            UserName = user.UserName
         };
     }
+
+    private Dtos.ProductAudit.EStatus ConvertToEStatusModel(Entities.EStatus status)
+    => status switch
+    {
+        Entities.EStatus.Create => Dtos.ProductAudit.EStatus.Create,
+        Entities.EStatus.Delete => Dtos.ProductAudit.EStatus.Delete,
+        Entities.EStatus.Update => Dtos.ProductAudit.EStatus.Update,
+                              _ => Dtos.ProductAudit.EStatus.Create
+    };
 
 
 }

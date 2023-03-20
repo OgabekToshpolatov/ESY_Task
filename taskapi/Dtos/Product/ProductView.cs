@@ -1,10 +1,9 @@
-namespace taskapi.Dtos.ProductAudit;
+namespace taskapi.Dtos.Product;
 
-public class OldValue
+public class ProductView
 {
-    public long Id { get; set; }
     public string? Title { get; set; }
     public int Quantity { get; set; }
     public double Price { get; set; }
-
+    public double TotalPriceWithVat { get; set; }
 }

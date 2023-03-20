@@ -7,7 +7,7 @@ using taskapi.Data;
 
 #nullable disable
 
-namespace taskapi.Data.Migrations
+namespace taskapi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     partial class AppDbContextModelSnapshot : ModelSnapshot
@@ -175,10 +175,7 @@ namespace taskapi.Data.Migrations
                     b.Property<DateTime>("ChangeData")
                         .HasColumnType("TEXT");
 
-                    b.Property<long?>("NewValueId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<long?>("OldValueId")
+                    b.Property<long>("ProductId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Status")
@@ -189,9 +186,7 @@ namespace taskapi.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NewValueId");
-
-                    b.HasIndex("OldValueId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("ProductAudits");
                 });
@@ -319,17 +314,11 @@ namespace taskapi.Data.Migrations
 
             modelBuilder.Entity("taskapi.Entities.ProductAudit", b =>
                 {
-                    b.HasOne("taskapi.Entities.Product", "NewValue")
+                    b.HasOne("taskapi.Entities.User", "User")
                         .WithMany()
-                        .HasForeignKey("NewValueId");
+                        .HasForeignKey("UserId");
 
-                    b.HasOne("taskapi.Entities.Product", "OldValue")
-                        .WithMany()
-                        .HasForeignKey("OldValueId");
-
-                    b.Navigation("NewValue");
-
-                    b.Navigation("OldValue");
+                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }

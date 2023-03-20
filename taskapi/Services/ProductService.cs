@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using taskapi.Data;
@@ -10,11 +11,15 @@ namespace taskapi.Services;
 public class ProductService : IProductService
 {
     private readonly AppDbContext _context;
+    private readonly IProductAuditService _productAuditService;
+
     public ProductService(
-        AppDbContext context
+        AppDbContext context,
+        IProductAuditService productAuditService
         )
     {
         _context = context ;
+        _productAuditService = productAuditService ;
     }
 
     public async ValueTask<Result<Product>> CreateAsync(Product model, string userId)
@@ -23,9 +28,19 @@ public class ProductService : IProductService
         {
             if(model is null) return new("Model is null");
 
-             await _context.Products!.AddAsync(model);
+            await _context.Products!.AddAsync(model);
 
             await _context.SaveChangesAsync();
+
+            var newProductAudit = new ProductAudit()
+            {
+               UserId = userId,
+               ProductId = model.Id,
+               Status = EStatus.Create,
+               ChangeData = DateTime.Now
+            };
+
+            await _productAuditService.AddAsync(newProductAudit);
 
             return new(true) {Data = model};
 
@@ -47,7 +62,6 @@ public class ProductService : IProductService
 
             products.ForEach(product => {
               product.TotalPriceWithVat = Calculate.VatCalculating(product,Vat.Value);
-              product.Price = product.TotalPriceWithVat;
             });
 
             return new(true){Data = products};
@@ -68,7 +82,7 @@ public class ProductService : IProductService
             if(product is null)
                   return new("Product not found"); 
 
-            product.Price = Calculate.VatCalculating(product,Vat.Value);
+            product.TotalPriceWithVat = Calculate.VatCalculating(product,Vat.Value);
     
             return new(true) {Data = product}; 
         }
@@ -87,9 +101,19 @@ public class ProductService : IProductService
             if(product is null)
                 return new("Product not found");
 
-             _context.Products.Remove(product);
+            _context.Products.Remove(product);
 
              _context.SaveChanges();
+
+            var newProductAudit = new ProductAudit()
+           {
+               UserId = userId,
+               ProductId = id,
+               Status = EStatus.Delete,
+               ChangeData = DateTime.Now
+           };
+
+            await _productAuditService.AddAsync(newProductAudit);
 
             return new(true){ };
 
@@ -114,6 +138,16 @@ public class ProductService : IProductService
             product.Price = model.Price;
 
             _context.SaveChanges();
+
+            var newProductAudit = new ProductAudit()
+           {
+               UserId = userId,
+               ProductId = model.Id,
+               Status = EStatus.Update,
+               ChangeData = DateTime.Now
+           };
+
+            await _productAuditService.AddAsync(newProductAudit);
 
             return new(true){Data = product}; 
         }

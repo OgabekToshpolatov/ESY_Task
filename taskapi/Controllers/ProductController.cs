@@ -1,3 +1,4 @@
+using System;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -46,16 +47,15 @@ public class ProductController:ControllerBase
 
       await _productService.CreateAsync(entity,user.Id);
 
-      var productAudit = new Entities.ProductAudit()
-      {
-        UserId = user.Id,
-        OldValue = null,
-        NewValue = entity,
-        Status = EStatus.Create,
-        ChangeData = DateTime.Now,
-      };
+    //   var newProductAudit = new ProductAudit()
+    //   {
+    //     UserId = user.Id,
+    //     ProductId = entity.Id,
+    //     Status = EStatus.Create,
+    //     ChangeData = DateTime.Now
+    //   };
 
-      await _productAuditService.AddAsync(productAudit);
+    //   await _productAuditService.AddAsync(newProductAudit);
 
       return Ok(product);
     }
@@ -68,10 +68,10 @@ public class ProductController:ControllerBase
         if(products.Data!.Count == 0)
             return BadRequest("The database is empty");
 
-        var productDto = products.Data!
-            .Select(product => product.Adapt<Dtos.Product.Product>());
+        var productView = products.Data!
+            .Select(product => product.Adapt<Dtos.Product.ProductView>());
 
-        return Ok(productDto);
+        return Ok(productView);
     }
 
     [HttpGet("{id}")]
@@ -82,7 +82,7 @@ public class ProductController:ControllerBase
         if(product.Data is null)
             return NotFound("Product not found");
 
-        var productView = product.Data.Adapt<Dtos.Product.Product>();
+        var productView = product.Data.Adapt<Dtos.Product.ProductView>();
 
         return Ok(productView);      
     }
@@ -98,6 +98,9 @@ public class ProductController:ControllerBase
             return BadRequest();
         
         var product =await _productService.Remove(id,user.Id);
+
+        if(!product.IsSuccess)
+                return BadRequest("Product not found"); 
  
         return Ok();
     }
@@ -122,6 +125,6 @@ public class ProductController:ControllerBase
         if(!product.IsSuccess)
             return BadRequest("Product not found");
            
-        return Ok(product.Data);
+        return Ok(product.Data!.Adapt<Dtos.Product.Product>());
     }
 }
