@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace taskapi.Migrations
+namespace taskapi.Data.Migrations
 {
     public partial class Init : Migration
     {
@@ -180,7 +180,8 @@ namespace taskapi.Migrations
                     UserId = table.Column<string>(type: "TEXT", nullable: true),
                     OldValueId = table.Column<long>(type: "INTEGER", nullable: true),
                     NewValueId = table.Column<long>(type: "INTEGER", nullable: true),
-                    Status = table.Column<int>(type: "INTEGER", nullable: false)
+                    Status = table.Column<int>(type: "INTEGER", nullable: false),
+                    ChangeData = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {

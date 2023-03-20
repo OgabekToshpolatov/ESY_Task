@@ -16,5 +16,6 @@ public class ProductAudit
     [Display(Name ="NewValue")]
     public virtual Product? NewValue { get; set; }
     public EStatus Status { get; set; }
+    public DateTime ChangeData { get; set; }
 
 }

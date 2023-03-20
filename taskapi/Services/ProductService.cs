@@ -10,7 +10,9 @@ namespace taskapi.Services;
 public class ProductService : IProductService
 {
     private readonly AppDbContext _context;
-    public ProductService(AppDbContext context)
+    public ProductService(
+        AppDbContext context
+        )
     {
         _context = context ;
     }

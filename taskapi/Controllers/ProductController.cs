@@ -15,19 +15,22 @@ public class ProductController:ControllerBase
     private readonly ILogger<ProductController> _logger;
     private readonly IProductService _productService;
     private readonly UserManager<User> _userManager;
+    private readonly IProductAuditService _productAuditService;
 
     public ProductController(
         ILogger<ProductController> logger,
         IProductService productService,
-        UserManager<User> userManager)
+        UserManager<User> userManager,
+        IProductAuditService productAuditService)
     {
         _logger = logger ;
         _productService = productService ;
         _userManager = userManager ;
+        _productAuditService = productAuditService ;
     }
     
     [HttpPost]
-    public async Task<IActionResult> PostProduct(Dtos.Product product)
+    public async Task<IActionResult> PostProduct(Dtos.Product.Product product)
     {
       if(!ModelState.IsValid) 
             return BadRequest();
@@ -37,11 +40,22 @@ public class ProductController:ControllerBase
       var user = _userManager.Users.FirstOrDefault(x => x.UserName == userIdentityName);
 
       if(user is null)
-            return BadRequest();   
+            return BadRequest();
 
       var entity =  product.Adapt<Entities.Product>();       
 
       await _productService.CreateAsync(entity,user.Id);
+
+      var productAudit = new Entities.ProductAudit()
+      {
+        UserId = user.Id,
+        OldValue = null,
+        NewValue = entity,
+        Status = EStatus.Create,
+        ChangeData = DateTime.Now,
+      };
+
+      await _productAuditService.AddAsync(productAudit);
 
       return Ok(product);
     }
@@ -51,8 +65,11 @@ public class ProductController:ControllerBase
     {
         var products = await _productService.GetAll();
 
+        if(products.Data!.Count == 0)
+            return BadRequest("The database is empty");
+
         var productDto = products.Data!
-            .Select(product => product.Adapt<Dtos.Product>());
+            .Select(product => product.Adapt<Dtos.Product.Product>());
 
         return Ok(productDto);
     }
@@ -65,7 +82,7 @@ public class ProductController:ControllerBase
         if(product.Data is null)
             return NotFound("Product not found");
 
-        var productView = product.Data.Adapt<Dtos.Product>();
+        var productView = product.Data.Adapt<Dtos.Product.Product>();
 
         return Ok(productView);      
     }
@@ -86,7 +103,7 @@ public class ProductController:ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateProduct(long id, Dtos.Product updateproduct)
+    public async Task<IActionResult> UpdateProduct(long id, Dtos.Product.Product updateproduct)
     {
         var userIdentityName = User.Identity!.Name;
 
@@ -106,15 +123,5 @@ public class ProductController:ControllerBase
             return BadRequest("Product not found");
            
         return Ok(product.Data);
-    }
-
-    private Dtos.Product ToDto(Entities.Product entity)
-    {
-        return new Dtos.Product()
-        {
-            Title = entity.Title,
-            Quantity = entity.Quantity,
-            Price = entity.TotalPriceWithVat,
-        };
     }
 }
