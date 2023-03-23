@@ -1,3 +1,4 @@
+using System.Net;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Mvc;
 using taskapi.Services;
@@ -19,7 +20,6 @@ public class HistoryController:ControllerBase
     public async Task<IActionResult> Audit()
     {
         var histories =await _productAuditService.GetAllAsync();
-
         var historiesView = histories.Select(history => ConvertToRoomModel(history)).ToList();
 
         return Ok(historiesView);
