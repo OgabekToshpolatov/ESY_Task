@@ -11,7 +11,7 @@ export class ApiService {
   constructor(private http:HttpClient) { }
 
   getProduct(){
-    return this.http.get<any>(`${this.baseUrlProduct}`);
+    return this.http.get<any>(this.baseUrlProduct);
   }
 
 }

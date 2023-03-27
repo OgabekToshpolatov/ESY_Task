@@ -1,4 +1,4 @@
-import { Component,ViewChild } from '@angular/core';
+import { Component,OnInit,ViewChild } from '@angular/core';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSort} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
@@ -12,7 +12,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
   styleUrls: ['./app.component.css'],
   providers:[ApiService]
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'appng';
 
   constructor(private api:ApiService){}
@@ -22,6 +22,10 @@ export class AppComponent {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
+
+  ngOnInit():void{
+    this.getAllProducts();
+  }
 
   getAllProducts(){
     return this.api.getProduct()

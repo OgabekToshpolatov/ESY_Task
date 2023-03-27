@@ -4,7 +4,8 @@ namespace taskapi.Dtos.Product;
 
 public class Product
 {
-    [Required]
+    [Required
+    ]
     public string? Title { get; set; }
 
     [Required]

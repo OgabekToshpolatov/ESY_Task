@@ -12,6 +12,16 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddCors(options => {
+    
+       options.AddPolicy("MyPolicy", builder => {
+
+               builder.AllowAnyOrigin()
+                                      .AllowAnyMethod()
+                                                      .AllowAnyHeader();
+    });
+});
+
 builder.Services.AddScoped<IProductService,ProductService>();
 builder.Services.AddScoped<IProductAuditService, ProductAuditService>();
 
@@ -42,6 +52,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("MyPolicy");
 
 app.UseAuthentication();
 app.UseAuthorization();
