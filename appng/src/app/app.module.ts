@@ -14,6 +14,9 @@ import { MatSortModule } from '@angular/material/sort';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import { HttpClientModule } from '@angular/common/http';
 import { MatInputModule } from '@angular/material/input';
+import { DialogComponent } from './components/dialog/dialog.component';
+import { SigninComponent } from './components/signin/signin.component';
+import { SignupComponent } from './components/signup/signup.component';
 
 
 
@@ -21,6 +24,9 @@ import { MatInputModule } from '@angular/material/input';
 @NgModule({
   declarations: [
     AppComponent,
+    DialogComponent,
+    SigninComponent,
+    SignupComponent,
   ],
   imports: [
     BrowserModule,
