@@ -1,1 +1,33 @@
-<p>dialog works!</p>
+<!DOCTYPE html>
+<h1 mat-dialog-title>Add Product</h1>
+  <div mat-dialog-content>
+      <form [formGroup]="productForm">
+        <br>
+      <mat-form-field appearance="outline">
+        <mat-label>Title</mat-label>
+        <input matInput formControlName="title" placeholder="Title">
+        <mat-icon matSuffix></mat-icon>
+        <mat-hint></mat-hint><br>
+      </mat-form-field>
+      <br>
+      <mat-form-field appearance="outline">
+        <mat-label>Quantity</mat-label>
+        <input matInput formControlName="quantity" placeholder="Quantity">
+        <mat-icon matSuffix>dialpad</mat-icon>
+        <mat-hint></mat-hint><br>
+      </mat-form-field>
+      <br>
+      <mat-form-field appearance="outline">
+        <mat-label>Price</mat-label>
+        <input matInput formControlName="price" placeholder="Price">
+        <mat-icon matSuffix>attach_money</mat-icon>
+        <mat-hint></mat-hint><br>
+      </mat-form-field>
+
+      </form>
+  </div>
+<div mat-dialog-actions [align]="'end'">
+  <button mat-raised-button color="warn" mat-dialog-close>Close</button>
+  <button mat-raised-button color="primary" (click)="addProduct()">Save</button>
+</div>
+

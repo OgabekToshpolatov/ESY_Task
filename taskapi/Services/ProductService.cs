@@ -28,6 +28,7 @@ public class ProductService : IProductService
         {
             if(model is null) return new("Model is null");
 
+
             await _context.Products!.AddAsync(model);
 
             await _context.SaveChangesAsync();
@@ -47,6 +48,7 @@ public class ProductService : IProductService
         }
         catch (System.Exception e)
         {
+            System.Console.WriteLine("1111111111111111111111111111111111111111111111111111111111111");
              throw new Exception(e.Message);
         }
     }
@@ -57,13 +59,15 @@ public class ProductService : IProductService
         {
             var products =await  _context.Products!.ToListAsync();
 
-            if(products.Count == 0)
-                return new("Product not found");
+            if(products.Count != 0)
+            {
+                products.ForEach(product => {
 
-            products.ForEach(product => {
-              product.TotalPriceWithVat = Calculate.VatCalculating(product,Vat.Value);
-            });
+                product.TotalPriceWithVat = Calculate.VatCalculating(product,Vat.Value);
 
+                });
+            }
+            
             return new(true){Data = products};
               
         }

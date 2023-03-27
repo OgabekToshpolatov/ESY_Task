@@ -33,31 +33,24 @@ public class ProductController:ControllerBase
     [HttpPost]
     public async Task<IActionResult> PostProduct(Dtos.Product.Product product)
     {
-      if(!ModelState.IsValid) 
-            return BadRequest();
-      
-      var userIdentityName = User.Identity!.Name;
-
-      var user = _userManager.Users.FirstOrDefault(x => x.UserName == userIdentityName);
-
-      if(user is null)
+        System.Console.WriteLine(product.Price);
+        System.Console.WriteLine("_____________________________________________");
+        if(!ModelState.IsValid) 
             return BadRequest();
 
-      var entity =  product.Adapt<Entities.Product>();       
+    //   var userIdentityName = User.Identity!.Name;
 
-      await _productService.CreateAsync(entity,user.Id);
-
-    //   var newProductAudit = new ProductAudit()
+    //   var user = _userManager.Users.FirstOrDefault(x => x.UserName == userIdentityName);
+    //   if(user is null)
     //   {
-    //     UserId = user.Id,
-    //     ProductId = entity.Id,
-    //     Status = EStatus.Create,
-    //     ChangeData = DateTime.Now
-    //   };
+    //       return BadRequest();
+    //   }
 
-    //   await _productAuditService.AddAsync(newProductAudit);
+        var entity =  product.Adapt<Entities.Product>();  
+                                                        //user.Id
+        await _productService.CreateAsync(entity,"fb1a6c44-c074-45d6-8abe-997c5fad84d9");
 
-      return Ok(product);
+        return Ok(product);
     }
 
     [HttpGet]
@@ -65,9 +58,11 @@ public class ProductController:ControllerBase
     {
         var products = await _productService.GetAll();
 
-        if(products.Data!.Count == 0)
-            return BadRequest("The database is empty");
+        System.Console.WriteLine("Salom gulim qandaysan ");
 
+        if(products.Data!.Count == 0)
+            return Ok(products.Data);
+        
         var productView = products.Data!
             .Select(product => product.Adapt<Dtos.Product.ProductView>());
 

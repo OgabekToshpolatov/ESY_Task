@@ -17,6 +17,10 @@ import { MatInputModule } from '@angular/material/input';
 import { DialogComponent } from './components/dialog/dialog.component';
 import { SigninComponent } from './components/signin/signin.component';
 import { SignupComponent } from './components/signup/signup.component';
+import { MatDialogModule ,MAT_DIALOG_DATA} from '@angular/material/dialog';
+import { ReactiveFormsModule,FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+
 
 
 
@@ -40,7 +44,11 @@ import { SignupComponent } from './components/signup/signup.component';
     MatSortModule,
     MatFormFieldModule,
     HttpClientModule,
-    MatInputModule
+    MatInputModule,
+    MatDialogModule,
+    ReactiveFormsModule,
+    FormsModule,
+    CommonModule
   ],
   providers: [],
   bootstrap: [AppComponent]

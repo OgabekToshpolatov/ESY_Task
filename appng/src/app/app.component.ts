@@ -1,3 +1,4 @@
+import { MatDialog ,MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { Component,OnInit,ViewChild } from '@angular/core';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSort} from '@angular/material/sort';
@@ -5,6 +6,7 @@ import {MatTableDataSource} from '@angular/material/table';
 import { ApiService } from './services/api.service'
 import { MatInputModule } from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
+import { DialogComponent } from './components/dialog/dialog.component';
 
 @Component({
   selector: 'app-root',
@@ -15,7 +17,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 export class AppComponent implements OnInit {
   title = 'appng';
 
-  constructor(private api:ApiService){}
+  constructor(private dialog:MatDialog,private api:ApiService){}
 
   displayedColumns: string[] = ['title', 'quantity', 'price', 'totalPriceWithVat'];
   dataSource!: MatTableDataSource<any>;
@@ -25,6 +27,12 @@ export class AppComponent implements OnInit {
 
   ngOnInit():void{
     this.getAllProducts();
+  }
+
+  openDialog(){
+    this.dialog.open(DialogComponent,{
+      width:"30%"
+    });
   }
 
   getAllProducts(){
