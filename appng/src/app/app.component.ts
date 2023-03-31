@@ -7,6 +7,7 @@ import { ApiService } from './services/api.service'
 import { MatInputModule } from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import { DialogComponent } from './components/dialog/dialog.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -17,7 +18,7 @@ import { DialogComponent } from './components/dialog/dialog.component';
 export class AppComponent implements OnInit {
   title = 'appng';
 
-  constructor(private dialog:MatDialog,private api:ApiService){}
+  constructor(private dialog:MatDialog,private api:ApiService, private router:Router){}
 
   displayedColumns: string[] = ['title', 'quantity', 'price', 'totalPriceWithVat'];
   dataSource!: MatTableDataSource<any>;
@@ -26,13 +27,21 @@ export class AppComponent implements OnInit {
   @ViewChild(MatSort) sort!: MatSort;
 
   ngOnInit():void{
-    this.getAllProducts();
+    // this.getAllProducts();
   }
 
   openDialog(){
     this.dialog.open(DialogComponent,{
       width:"30%"
     });
+  }
+
+  openSignUpDialog(){
+    this.router.navigate(['signup'])
+    console.log("salom_________________________________________________________________________________________");
+  }
+  openSignInDialog(){
+    this.router.navigate(['signin'])
   }
 
   getAllProducts(){
@@ -44,7 +53,7 @@ export class AppComponent implements OnInit {
            this.dataSource.sort = this.sort
          },
          error:() => {
-           alert("Something went wrong");
+           alert("Something went wrong getAll Products");
          }
       })
   }

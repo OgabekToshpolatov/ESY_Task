@@ -1,3 +1,6 @@
+using System.Net.Mail;
+using System.Text;
+using System.Text.RegularExpressions;
 using Mapster;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -31,14 +34,28 @@ public class AccountController:ControllerBase
     {
         if(!ModelState.IsValid)
                 return BadRequest();
+
+        System.Console.WriteLine("##############################################################################");
         
         if(await _userManager.Users.AnyAsync(u => u.Email == createUserDto.Email))
-                return BadRequest("This email is registered");
+                return BadRequest(new { Message = "Email already exist! " });
+        System.Console.WriteLine("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 
         if(await _userManager.Users.AnyAsync(u => u.UserName == createUserDto.UserName))
-                return BadRequest("There is a user with this username");
+                return BadRequest(new { Message = "Username already exist! " });
+
+        var passMessage = CheckPasswordStrength(createUserDto.Password!);
+            if (!string.IsNullOrEmpty(passMessage))
+                return BadRequest(new { Message = passMessage.ToString() });
+
+        if(createUserDto.Password != createUserDto.ConfirmPassword)
+                return BadRequest(new { Message = "Password doesn't equal to confirm password"});
+
+        System.Console.WriteLine("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
 
         var user = createUserDto.Adapt<User>();
+
+        user.Roles = new string[] {"user"};
 
         await _userManager.CreateAsync(user, createUserDto.Password);
 
@@ -48,7 +65,7 @@ public class AccountController:ControllerBase
 
         _logger.LogInformation("The user has successfully registered");
 
-        return Ok();
+        return Ok(new {Message = "User Registered "});
     }
 
     [HttpPost("signin")]
@@ -68,4 +85,17 @@ public class AccountController:ControllerBase
 
         return Ok(userSignInDto);
     }
+
+     private static string CheckPasswordStrength(string pass)
+     {
+        StringBuilder sb = new StringBuilder();
+        if (pass.Length < 8)
+            sb.Append("Minimum password length should be 8" + Environment.NewLine);
+        if (!(Regex.IsMatch(pass, "[a-z]") && Regex.IsMatch(pass, "[A-Z]") && Regex.IsMatch(pass, "[0-9]")))
+            sb.Append("Password should be AlphaNumeric" + Environment.NewLine);
+        if (!Regex.IsMatch(pass, "[<,>,@,!,#,$,%,^,&,*,(,),_,+,\\[,\\],{,},?,:,;,|,',\\,.,/,~,`,-,=]"))
+            sb.Append("Password should contain special charcter" + Environment.NewLine);
+        return sb.ToString();
+     }
+
 }

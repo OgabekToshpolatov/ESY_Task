@@ -24,6 +24,5 @@ public class UserSignUpDto
     [Display(Name ="Confirm Password")]    
     [Required]
     [DataType(DataType.Password)]
-    [Compare(nameof(Password),ErrorMessage ="Password doesn't equal to confirm password")]
     public string? ConfirmPassword { get; set; }
 }

@@ -10,7 +10,7 @@ namespace taskapi.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-// [Authorize]
+[Authorize]
 public class ProductController:ControllerBase
 {
     private readonly ILogger<ProductController> _logger;
@@ -34,21 +34,22 @@ public class ProductController:ControllerBase
     public async Task<IActionResult> PostProduct(Dtos.Product.Product product)
     {
         System.Console.WriteLine(product.Price);
-        System.Console.WriteLine("_____________________________________________");
+
         if(!ModelState.IsValid) 
             return BadRequest();
 
-    //   var userIdentityName = User.Identity!.Name;
+        var userIdentityName = User.Identity!.Name;
 
-    //   var user = _userManager.Users.FirstOrDefault(x => x.UserName == userIdentityName);
-    //   if(user is null)
-    //   {
-    //       return BadRequest();
-    //   }
+        var user = _userManager.Users.FirstOrDefault(x => x.UserName == userIdentityName);
+      
+         if(user is null)
+        {
+          return BadRequest();
+        }
 
         var entity =  product.Adapt<Entities.Product>();  
                                                         //user.Id
-        await _productService.CreateAsync(entity,"fb1a6c44-c074-45d6-8abe-997c5fad84d9");
+        await _productService.CreateAsync(entity,user.Id);
 
         return Ok(product);
     }
@@ -56,6 +57,8 @@ public class ProductController:ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetProducts()
     {
+        System.Console.WriteLine("################################################################################");
+        Console.WriteLine("________________________________________________________________________________________");
         var products = await _productService.GetAll();
 
         System.Console.WriteLine("Salom gulim qandaysan ");
@@ -122,4 +125,5 @@ public class ProductController:ControllerBase
            
         return Ok(product.Data!.Adapt<Dtos.Product.Product>());
     }
+
 }

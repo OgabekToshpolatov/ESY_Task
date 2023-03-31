@@ -1,3 +1,4 @@
+import { RouterModule , Routes} from '@angular/router';
 import { ApiService } from './services/api.service';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { NgModule } from '@angular/core';
@@ -20,6 +21,8 @@ import { SignupComponent } from './components/signup/signup.component';
 import { MatDialogModule ,MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { ReactiveFormsModule,FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
+
 
 
 
@@ -31,6 +34,7 @@ import { CommonModule } from '@angular/common';
     DialogComponent,
     SigninComponent,
     SignupComponent,
+    DashboardComponent,
   ],
   imports: [
     BrowserModule,
@@ -48,7 +52,11 @@ import { CommonModule } from '@angular/common';
     MatDialogModule,
     ReactiveFormsModule,
     FormsModule,
-    CommonModule
+    CommonModule,
+    RouterModule,
+    AppRoutingModule,
+    FormsModule,
+
   ],
   providers: [],
   bootstrap: [AppComponent]
