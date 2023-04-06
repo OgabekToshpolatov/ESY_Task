@@ -1,4 +1,5 @@
 using System.Net.Mail;
+using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
 using Mapster;
@@ -7,6 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using taskapi.Dtos.AppUser;
 using taskapi.Entities;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace taskapi.Controllers;
 
@@ -17,15 +20,18 @@ public class AccountController:ControllerBase
     private readonly ILogger<AccountController> _logger;
     private readonly UserManager<User> _userManager;
     private readonly SignInManager<User> _signManager;
+    private readonly IConfiguration _configuration;
 
     public AccountController(
         UserManager<User> userManager,
         SignInManager<User> signInManager,
-        ILogger<AccountController> logger)
+        ILogger<AccountController> logger,
+        IConfiguration configuration)
     {
         _logger = logger ;
         _userManager = userManager;
         _signManager = signInManager;
+        _configuration = configuration;
 
     }
 
@@ -35,11 +41,9 @@ public class AccountController:ControllerBase
         if(!ModelState.IsValid)
                 return BadRequest();
 
-        System.Console.WriteLine("##############################################################################");
         
         if(await _userManager.Users.AnyAsync(u => u.Email == createUserDto.Email))
                 return BadRequest(new { Message = "Email already exist! " });
-        System.Console.WriteLine("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 
         if(await _userManager.Users.AnyAsync(u => u.UserName == createUserDto.UserName))
                 return BadRequest(new { Message = "Username already exist! " });
@@ -51,7 +55,6 @@ public class AccountController:ControllerBase
         if(createUserDto.Password != createUserDto.ConfirmPassword)
                 return BadRequest(new { Message = "Password doesn't equal to confirm password"});
 
-        System.Console.WriteLine("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
 
         var user = createUserDto.Adapt<User>();
 
@@ -71,19 +74,31 @@ public class AccountController:ControllerBase
     [HttpPost("signin")]
     public async Task<IActionResult> SignIn(UserSignInDto userSignInDto)
     {
-        if(!ModelState.IsValid)
-                return BadRequest();
+        var user = await _userManager.FindByNameAsync(userSignInDto.UserName);
+            if (user != null && await _userManager.CheckPasswordAsync(user, userSignInDto.Password))
+            {
+                var userRoles = await _userManager.GetRolesAsync(user);
 
-        if(!await _userManager.Users.AnyAsync(user => user.UserName == userSignInDto.UserName))
-                return NotFound();
+                var authClaims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, user.UserName),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                };
 
-        var result = await _signManager.PasswordSignInAsync(userSignInDto.UserName, userSignInDto.Password,
-                isPersistent:true,false);
+                foreach (var userRole in userRoles)
+                {
+                    authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+                }
 
-        if(!result.Succeeded)
-                return BadRequest();
+               var token = GetToken(authClaims);
 
-        return Ok(userSignInDto);
+                return Ok(new
+                {
+                    token = new JwtSecurityTokenHandler().WriteToken(token),
+                    expiration = token.ValidTo
+                });
+            }
+            return Unauthorized();
     }
 
      private static string CheckPasswordStrength(string pass)
@@ -97,5 +112,26 @@ public class AccountController:ControllerBase
             sb.Append("Password should contain special charcter" + Environment.NewLine);
         return sb.ToString();
      }
+
+     private JwtSecurityToken GetToken(List<Claim> authClaims)
+        {
+            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
+
+            var token = new JwtSecurityToken(
+                issuer: _configuration["JWT:ValidIssuer"],
+                audience: _configuration["JWT:ValidAudience"],
+                expires: DateTime.Now.AddHours(3),
+                claims: authClaims,
+                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+                );
+            
+            var tokenCookie = new JwtSecurityTokenHandler().WriteToken(token);
+
+            HttpContext.Response.Cookies.Append("AuthTokenBirnam",tokenCookie);
+                            // new Microsoft.AspNetCore.Http.CookieOptions
+                            //              { Expires = DateTime.Now.AddHours(3)} 
+
+            return token;
+        }
 
 }

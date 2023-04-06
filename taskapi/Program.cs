@@ -1,5 +1,8 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using taskapi.Data;
 using taskapi.Entities;
 using taskapi.Services;
@@ -7,10 +10,9 @@ using taskapi.Statics;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+ConfigurationManager configuration = builder.Configuration;
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddControllers();
 
 builder.Services.AddCors(options => {
     
@@ -33,12 +35,41 @@ builder.Services.AddIdentity<User,IdentityRole>(options => {
     options.Password.RequireDigit = false;
 
 }).AddRoles<IdentityRole>()
-.AddEntityFrameworkStores<AppDbContext>(); // Pr tugasi organaman shuni 
+.AddEntityFrameworkStores<AppDbContext>()
+.AddDefaultTokenProviders(); // Pr tugasi organaman shuni 
+
+builder.Services.AddAuthentication(options => {
+
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddCookie("cookie")
+.AddJwtBearer(options =>{
+
+   options.SaveToken = true ;
+   options.RequireHttpsMetadata = false;
+   options.TokenValidationParameters = new TokenValidationParameters()
+   {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidAudience = configuration["JWT:ValidAudience"],
+        ValidIssuer = configuration["JWT:ValidIssuer"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Secret"]))
+   };
+
+});
+
+
 
 builder.Services.AddDbContext<AppDbContext>(options =>{
      
     options.UseLazyLoadingProxies().UseSqlite("Data Source = data.db");
 });
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 
 Vat.Value = double.Parse(builder.Configuration["VAT"]);
 

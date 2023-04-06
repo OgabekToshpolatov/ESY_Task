@@ -11,7 +11,7 @@ using taskapi.Data;
 namespace taskapi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230320181234_Init")]
+    [Migration("20230405182653_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
