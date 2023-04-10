@@ -1,8 +1,8 @@
 import { Route, Router } from '@angular/router';
-import { ApiService } from './../../services/api.service';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import ValidateForm from 'src/app/helpers/validationforms';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-signup',
@@ -16,7 +16,7 @@ export class SignupComponent implements OnInit {
   isText: boolean = false;
   eyeIcon:string = "fa-eye-slash"
   eyeIcon1:string ="fa-eye-slash"
-  constructor(private fb:FormBuilder, private api:ApiService, private router:Router){}
+  constructor(private fb:FormBuilder, private auth:AuthService, private router:Router){}
 
   ngOnInit(): void {
     this.signUpForm = this.fb.group({
@@ -38,7 +38,7 @@ export class SignupComponent implements OnInit {
 
   onSignUp(){
     if(this.signUpForm.valid){
-      this.api.signup(this.signUpForm.value)
+      this.auth.signup(this.signUpForm.value)
           .subscribe({
             next:(res) => {
               alert(res.message)

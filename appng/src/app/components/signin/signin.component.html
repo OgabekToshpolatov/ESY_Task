@@ -7,7 +7,7 @@
                       <h3 class="pt-3 font-weight-bold title">Login</h3>
                   </div>
                   <div class="panel-body p-3">
-                      <form [formGroup]="signInForm" (ngSubmit)="onSignUp()">
+                      <form [formGroup]="signInForm" (ngSubmit)="onSignIn()">
                           <div class="form-group pt-3">
                               <div class="input-field" [class.error]="signInForm.controls['username'].dirty && signInForm.hasError('required','username')"> <span class="fa fa-user p-2"></span> <input formControlName="username" type="text" placeholder="Username" required> </div>
                           </div>

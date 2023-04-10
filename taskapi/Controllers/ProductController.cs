@@ -10,7 +10,7 @@ namespace taskapi.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
+// [Authorize]
 public class ProductController:ControllerBase
 {
     private readonly ILogger<ProductController> _logger;
@@ -36,7 +36,7 @@ public class ProductController:ControllerBase
         System.Console.WriteLine(product.Price);
 
         if(!ModelState.IsValid) 
-            return BadRequest();
+            return BadRequest(new { Message = "Modelstate is not  Valid"});
 
         var userIdentityName = User.Identity!.Name;
 
@@ -44,7 +44,7 @@ public class ProductController:ControllerBase
       
          if(user is null)
         {
-          return BadRequest();
+          return BadRequest(new {Message ="User No"});
         }
 
         var entity =  product.Adapt<Entities.Product>();  
@@ -69,7 +69,7 @@ public class ProductController:ControllerBase
         var productView = products.Data!
             .Select(product => product.Adapt<Dtos.Product.ProductView>());
 
-        return Ok(productView);
+        return Ok(products.Data);
     }
 
     [HttpGet("{id}")]

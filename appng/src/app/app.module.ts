@@ -13,7 +13,7 @@ import {MatIconModule} from '@angular/material/icon';
 import {MatTableModule} from '@angular/material/table';
 import { MatSortModule } from '@angular/material/sort';
 import {MatFormFieldModule} from '@angular/material/form-field';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { MatInputModule } from '@angular/material/input';
 import { DialogComponent } from './components/dialog/dialog.component';
 import { SigninComponent } from './components/signin/signin.component';
@@ -22,6 +22,7 @@ import { MatDialogModule ,MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { ReactiveFormsModule,FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { TokenInterceptor } from './interceptors/token.interceptor';
 
 
 
@@ -58,7 +59,11 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
     FormsModule,
 
   ],
-  providers: [],
+  providers: [{
+    provide:HTTP_INTERCEPTORS,
+    useClass:TokenInterceptor,
+    multi:true
+  }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

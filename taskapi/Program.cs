@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using taskapi.Data;
 using taskapi.Entities;
 using taskapi.Services;
@@ -68,7 +69,33 @@ builder.Services.AddDbContext<AppDbContext>(options =>{
 });
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(); 
+// builder.Services.AddSwaggerGen(options =>
+// {
+//     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+//     {
+//         Description = "Enter given token like this: Bearer <your_token>",
+//         In = ParameterLocation.Header,
+//         Name = "Authorization",
+//         Type = SecuritySchemeType.ApiKey,
+//         Scheme = "Bearer"
+//     });
+
+//     options.AddSecurityRequirement(new OpenApiSecurityRequirement
+//     {
+//         {
+//             new OpenApiSecurityScheme()
+//             {
+//                 Reference = new OpenApiReference
+//                 {
+//                     Id="Bearer",
+//                     Type = ReferenceType.SecurityScheme
+//                 }
+//             },
+//             new List<string>()
+//         }
+//     });
+// });
 
 
 Vat.Value = double.Parse(builder.Configuration["VAT"]);

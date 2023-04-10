@@ -8,17 +8,7 @@ export class ApiService {
 
   private baseUrlProduct : string = "https://localhost:7048/api/Product/"
 
-  private baseUrlAccount : string = "https://localhost:7048/api/Account/"
-
   constructor(private http:HttpClient) { }
-
-  signup(signUp:any){
-    return this.http.post<any>(`${this.baseUrlAccount}signup`,signUp)
-  }
-
-  signin(signIn:any){
-    return this.http.post<any>(`${this.baseUrlAccount}signin`,signIn)
-  }
 
   getProduct(){
     return this.http.get<any>(this.baseUrlProduct);
@@ -27,5 +17,13 @@ export class ApiService {
   postProduct(data:any){
     return this.http.post<any>(`${this.baseUrlProduct}`,data);
   }
+
+  putProduct(id:number, data:any){
+    return this.http.put<any>(`${this.baseUrlProduct}` +  id, data);
+  }
+
+  deleteProduct(id:number){
+    return this.http.delete<any>(`${this.baseUrlProduct}`+ id);
+   }
 
 }

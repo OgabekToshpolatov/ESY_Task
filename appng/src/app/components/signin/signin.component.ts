@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import ValidateForm from 'src/app/helpers/validationforms';
-import { ApiService } from 'src/app/services/api.service';
+import { AuthService } from 'src/app/services/auth.service';
+import { UserStoreService } from 'src/app/services/user-store.service';
 
 @Component({
   selector: 'app-signin',
@@ -18,8 +19,9 @@ export class SigninComponent implements OnInit{
 
   constructor(
     private fb:FormBuilder,
-    private api:ApiService,
-    private router:Router){}
+    private auth:AuthService,
+    private router:Router,
+    private userStore:UserStoreService){}
 
   ngOnInit(): void {
     this.signInForm = this.fb.group({
@@ -35,13 +37,16 @@ export class SigninComponent implements OnInit{
     this.isText ? (this.type = 'text') : (this.type = 'password');
   }
 
-  onSignUp(){
+  onSignIn(){
     if(this.signInForm.valid){
-      this.api.signin(this.signInForm.value)
+      this.auth.signin(this.signInForm.value)
           .subscribe({
             next:(res) => {
               alert("Succesfully boldi okalar ")
               this.signInForm.reset();
+              this.auth.storeToken(res.token)
+              let tokenPayload = this.auth.decodedToken();
+              this.userStore.setRoleForStore(tokenPayload.role);
               this.router.navigate(['dashboard'])
             },
             error:(err) =>{

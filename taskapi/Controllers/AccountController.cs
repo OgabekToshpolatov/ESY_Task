@@ -74,6 +74,7 @@ public class AccountController:ControllerBase
     [HttpPost("signin")]
     public async Task<IActionResult> SignIn(UserSignInDto userSignInDto)
     {
+        System.Console.WriteLine("##################################################################");
         var user = await _userManager.FindByNameAsync(userSignInDto.UserName);
             if (user != null && await _userManager.CheckPasswordAsync(user, userSignInDto.Password))
             {
@@ -84,18 +85,21 @@ public class AccountController:ControllerBase
                     new Claim(ClaimTypes.Name, user.UserName),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 };
-
+             System.Console.WriteLine("RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR");
                 foreach (var userRole in userRoles)
                 {
                     authClaims.Add(new Claim(ClaimTypes.Role, userRole));
                 }
 
-               var token = GetToken(authClaims);
+            System.Console.WriteLine("LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL");
+                var tokenHandlar = GetToken(authClaims);
+            System.Console.WriteLine("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
+
+            
 
                 return Ok(new
                 {
-                    token = new JwtSecurityTokenHandler().WriteToken(token),
-                    expiration = token.ValidTo
+                    token = tokenHandlar    
                 });
             }
             return Unauthorized();
@@ -113,25 +117,35 @@ public class AccountController:ControllerBase
         return sb.ToString();
      }
 
-     private JwtSecurityToken GetToken(List<Claim> authClaims)
-        {
+     private string GetToken(List<Claim> authClaims)
+        { 
+            var jwtTokenHandler = new JwtSecurityTokenHandler();
+
             var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
-
-            var token = new JwtSecurityToken(
-                issuer: _configuration["JWT:ValidIssuer"],
-                audience: _configuration["JWT:ValidAudience"],
-                expires: DateTime.Now.AddHours(3),
-                claims: authClaims,
-                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
-                );
             
-            var tokenCookie = new JwtSecurityTokenHandler().WriteToken(token);
+            var identity = new ClaimsIdentity(authClaims);
 
-            HttpContext.Response.Cookies.Append("AuthTokenBirnam",tokenCookie);
+            // var token = new JwtSecurityToken(
+            //     issuer: _configuration["JWT:ValidIssuer"],
+            //     audience: _configuration["JWT:ValidAudience"],
+            //     expires: DateTime.Now.AddHours(1),
+            //     claims: identity,
+            //     signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+            //     );
+            
+            // var tokenCookie = new JwtSecurityTokenHandler().WriteToken(token);
+
+            // HttpContext.Response.Cookies.Append("AuthTokenBirnam",tokenCookie);
                             // new Microsoft.AspNetCore.Http.CookieOptions
                             //              { Expires = DateTime.Now.AddHours(3)} 
-
-            return token;
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = identity,
+                Expires = DateTime.Now.AddSeconds(10),
+                SigningCredentials = new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+            };
+            var token = jwtTokenHandler.CreateToken(tokenDescriptor);
+            return jwtTokenHandler.WriteToken(token);
         }
 
 }
