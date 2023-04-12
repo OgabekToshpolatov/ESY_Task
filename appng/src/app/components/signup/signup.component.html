@@ -27,7 +27,9 @@
                           <div class="form-group pt-3">
                               <div class="input-field" [class.error]="signUpForm.controls['password'].dirty && signUpForm.hasError('required','password')"> <span class="fa fa-lock px-2"></span> <input formControlName="password" [type]="type" placeholder="Password"> <button (click)="hideShowPass()" type="button" class="bg-white text-muted"> <span class="fa {{eyeIcon}}"></span> </button>     </div>
                           </div>
+                          <small *ngIf="signUpForm.controls['password'].dirty && signUpForm.controls['password'].errors?.['minlength']" class="text-danger">*Password must be over 8 charachters!*</small>
                           <small *ngIf="signUpForm.controls['password'].dirty && signUpForm.hasError('required','password')" class="text-danger">*Password is required*</small>
+
 
                           <div class="form-group pt-3">
                             <div class="input-field" [class.error]="signUpForm.controls['confirmPassword'].dirty && signUpForm.hasError('required','confirmPassword')"> <span class="fa fa-lock px-2"></span> <input formControlName="confirmPassword" [type]="type" placeholder="Confirm Password"> <button (click)="hideShowPass()" type="button" class="bg-white text-muted"> <span class="fa {{eyeIcon}}"></span> </button>     </div>

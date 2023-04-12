@@ -1,8 +1,9 @@
 import { Route, Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, MinLengthValidator, Validators } from '@angular/forms';
 import ValidateForm from 'src/app/helpers/validationforms';
 import { AuthService } from 'src/app/services/auth.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-signup',
@@ -16,7 +17,7 @@ export class SignupComponent implements OnInit {
   isText: boolean = false;
   eyeIcon:string = "fa-eye-slash"
   eyeIcon1:string ="fa-eye-slash"
-  constructor(private fb:FormBuilder, private auth:AuthService, private router:Router){}
+  constructor(private fb:FormBuilder, private auth:AuthService, private router:Router, private toastr:ToastrService){}
 
   ngOnInit(): void {
     this.signUpForm = this.fb.group({
@@ -36,17 +37,20 @@ export class SignupComponent implements OnInit {
     this.isText ? this.type = 'text' : this.type = 'password'
   }
 
+
   onSignUp(){
     if(this.signUpForm.valid){
+      const password = this.signUpForm.get('password')!.value;
+      console.log(password)
       this.auth.signup(this.signUpForm.value)
           .subscribe({
             next:(res) => {
-              alert(res.message)
+              this.toastr.success(res.message)
               this.signUpForm.reset();
               this.router.navigate(['signin'])
             },
             error:(err) =>{
-              alert(err?.error.message)
+              this.toastr.error(err?.error.message)
             }
           })
     }

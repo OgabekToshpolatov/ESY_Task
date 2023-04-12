@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 import ValidateForm from 'src/app/helpers/validationforms';
 import { AuthService } from 'src/app/services/auth.service';
 import { UserStoreService } from 'src/app/services/user-store.service';
@@ -21,7 +22,8 @@ export class SigninComponent implements OnInit{
     private fb:FormBuilder,
     private auth:AuthService,
     private router:Router,
-    private userStore:UserStoreService){}
+    private userStore:UserStoreService,
+    private toastr:ToastrService){}
 
   ngOnInit(): void {
     this.signInForm = this.fb.group({
@@ -39,18 +41,19 @@ export class SigninComponent implements OnInit{
 
   onSignIn(){
     if(this.signInForm.valid){
+
       this.auth.signin(this.signInForm.value)
           .subscribe({
             next:(res) => {
-              alert("Succesfully boldi okalar ")
               this.signInForm.reset();
               this.auth.storeToken(res.token)
-              let tokenPayload = this.auth.decodedToken();
+              this.router.navigate(['dashboard']).then(() => { window.location.reload() })
+              this.toastr.success("Succesfully")
+              const tokenPayload = this.auth.decodedToken();
               this.userStore.setRoleForStore(tokenPayload.role);
-              this.router.navigate(['dashboard'])
             },
             error:(err) =>{
-              alert(" Rasvo boldi okalar ")
+              this.toastr.error("Username or password is incorrect")
             }
           })
     }

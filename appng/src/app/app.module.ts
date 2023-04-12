@@ -23,6 +23,7 @@ import { ReactiveFormsModule,FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { TokenInterceptor } from './interceptors/token.interceptor';
+import { ToastrModule } from 'ngx-toastr';
 
 
 
@@ -57,6 +58,9 @@ import { TokenInterceptor } from './interceptors/token.interceptor';
     RouterModule,
     AppRoutingModule,
     FormsModule,
+    ToastrModule . forRoot ( ),
+    BrowserAnimationsModule
+
 
   ],
   providers: [{

@@ -9,6 +9,7 @@ import { ApiService } from 'src/app/services/api.service';
 import { DialogComponent } from '../dialog/dialog.component';
 import { AuthService } from 'src/app/services/auth.service';
 import { UserStoreService } from 'src/app/services/user-store.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-dashboard',
@@ -18,28 +19,42 @@ import { UserStoreService } from 'src/app/services/user-store.service';
 export class DashboardComponent implements OnInit{
 
   public role :string ="";
+  displayedColumns: string[] = [];
 
   constructor(
     private api:ApiService,
     private auth:AuthService,
     private dialog:MatDialog,
-    private userStore:UserStoreService
-     ){ }
+    private userStore:UserStoreService,
+    private toastr:ToastrService
+     )
+     {
+      this.userStore.getRoleFromStore()
+      .subscribe(val => {
+        let roleFromToken = this.auth.getroleFromToken();
+        this.role = val || roleFromToken
+      })
+      if(this.role === "admin"){
+         this.displayedColumns = ['title', 'quantity', 'price', 'totalPriceWithVat','action'] ;
+      }else{
+         this.displayedColumns = ['title', 'quantity', 'price', 'totalPriceWithVat']
+      }
+     }
 
-  displayedColumns: string[] = ['title', 'quantity', 'price', 'totalPriceWithVat','action'];
   dataSource!: MatTableDataSource<any>;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
   ngOnInit(): void {
-    this.getAllProducts()
 
     this.userStore.getRoleFromStore()
         .subscribe(val => {
           let roleFromToken = this.auth.getroleFromToken();
           this.role = val || roleFromToken
         })
+
+        this.getAllProducts()
   }
 
   logout(){
@@ -51,7 +66,7 @@ export class DashboardComponent implements OnInit{
       width:"30%"
     })
     .afterClosed().subscribe(res => {
-      if(res ==="save"){
+      if(res ==="Save"){
         this.getAllProducts();
       }
     });
@@ -95,11 +110,12 @@ export class DashboardComponent implements OnInit{
     this.api.deleteProduct(id)
         .subscribe({
            next:(res) => {
-             alert("Product deleted succesfully")
+            alert("Product deleted succesfully")
+            this.toastr.success("Product deleted succesfully")
              this.getAllProducts()
           },
            error:() => {
-            alert("Something went wrong while delete product")
+            this.toastr.error("Something went wrong while delete product")
         }
       }
     )

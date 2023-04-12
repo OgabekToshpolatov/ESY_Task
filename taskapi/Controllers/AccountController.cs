@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using System.Net.Mail;
 using System.Security.Claims;
 using System.Text;
@@ -74,7 +75,6 @@ public class AccountController:ControllerBase
     [HttpPost("signin")]
     public async Task<IActionResult> SignIn(UserSignInDto userSignInDto)
     {
-        System.Console.WriteLine("##################################################################");
         var user = await _userManager.FindByNameAsync(userSignInDto.UserName);
             if (user != null && await _userManager.CheckPasswordAsync(user, userSignInDto.Password))
             {
@@ -85,15 +85,12 @@ public class AccountController:ControllerBase
                     new Claim(ClaimTypes.Name, user.UserName),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 };
-             System.Console.WriteLine("RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR");
                 foreach (var userRole in userRoles)
                 {
                     authClaims.Add(new Claim(ClaimTypes.Role, userRole));
                 }
 
-            System.Console.WriteLine("LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL");
                 var tokenHandlar = GetToken(authClaims);
-            System.Console.WriteLine("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
 
             
 
@@ -109,9 +106,29 @@ public class AccountController:ControllerBase
      {
         StringBuilder sb = new StringBuilder();
         if (pass.Length < 8)
+        {
             sb.Append("Minimum password length should be 8" + Environment.NewLine);
-        if (!(Regex.IsMatch(pass, "[a-z]") && Regex.IsMatch(pass, "[A-Z]") && Regex.IsMatch(pass, "[0-9]")))
-            sb.Append("Password should be AlphaNumeric" + Environment.NewLine);
+            return sb.ToString();
+        }
+        
+        if(!(Regex.IsMatch(pass, "[a-z]")))
+        {
+            sb.Append("Password must contain at least one lowercase letter!" + Environment.NewLine);
+            return sb.ToString();
+        }
+
+        if(!(Regex.IsMatch(pass, "[A-Z]")))
+        {
+            sb.Append("Password must contain at least one uppercase letter!" + Environment.NewLine);
+            return sb.ToString();
+        }
+
+        if(!(Regex.IsMatch(pass, "[0-9]")))
+        {
+            sb.Append("Password must contain at least one number!" + Environment.NewLine);
+            return sb.ToString();
+        }
+        
         if (!Regex.IsMatch(pass, "[<,>,@,!,#,$,%,^,&,*,(,),_,+,\\[,\\],{,},?,:,;,|,',\\,.,/,~,`,-,=]"))
             sb.Append("Password should contain special charcter" + Environment.NewLine);
         return sb.ToString();
@@ -141,7 +158,9 @@ public class AccountController:ControllerBase
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = identity,
-                Expires = DateTime.Now.AddSeconds(10),
+                Issuer = _configuration["JWT:ValidIssuer"],
+                Audience = _configuration["JWT:ValidAudience"],
+                Expires = DateTime.Now.AddDays(1),
                 SigningCredentials = new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
             };
             var token = jwtTokenHandler.CreateToken(tokenDescriptor);

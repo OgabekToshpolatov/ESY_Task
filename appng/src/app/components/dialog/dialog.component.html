@@ -2,26 +2,19 @@
 <h1 mat-dialog-title>{{actionName}}</h1>
   <div mat-dialog-content>
       <form [formGroup]="productForm">
-        <br>
-      <mat-form-field appearance="outline">
-        <mat-label>Title</mat-label>
-        <input matInput formControlName="title" placeholder="Title">
-        <mat-icon matSuffix></mat-icon>
-        <mat-hint></mat-hint><br>
-      </mat-form-field>
-      <br>
-      <mat-form-field appearance="outline">
-        <mat-label>Quantity</mat-label>
-        <input matInput formControlName="quantity" placeholder="Quantity">
-        <mat-hint></mat-hint><br>
-      </mat-form-field>
-      <br>
-      <mat-form-field appearance="outline">
-        <mat-label>Price</mat-label>
-        <input matInput formControlName="price" placeholder="Price">
-        <mat-hint></mat-hint><br>
-      </mat-form-field>
-
+        <div class="form-group pt-3">
+          <div class="input-field" [class.error]="productForm.controls['title'].dirty && productForm.hasError('required','title')"> <span class="fa fa-user p-2"></span> <input formControlName="title" type="text" placeholder="Title"></div>
+        </div>
+        <small *ngIf="productForm.controls['title'].dirty && productForm.hasError('required','title')" class="text-danger">*Title is required*</small>
+        <div class="form-group pt-3">
+          <div class="input-field" [class.error]="productForm.controls['quantity'].dirty && productForm.hasError('required','quantity')"> <span class="fa fa-user p-2"></span> <input formControlName="quantity" type="text" placeholder="Quantity"></div>
+        </div>
+        <small *ngIf="productForm.controls['quantity'].dirty && productForm.hasError('required','quantity')" class="text-danger">*Quantity is required*</small>
+        <div class="form-group pt-3">
+          <div class="input-field" [class.error]="productForm.controls['price'].dirty && productForm.hasError('required','price')"> <span class="fa fa-user p-2"></span> <input formControlName="price" type="text" placeholder="Price"></div>
+        </div>
+        <small *ngIf="productForm.controls['price'].dirty && productForm.hasError('required','price')" class="text-danger">*Price is required*</small>
+        <small *ngIf = "productForm.controls['price'].errors?.['pattern'] ">Value must be number.</small>
       </form>
   </div>
 <div mat-dialog-actions [align]="'end'">
